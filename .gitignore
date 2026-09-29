@@ -1,0 +1,12 @@
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Node / clasp local state
+node_modules/
+.clasp.json
+
+# Editor settings
+.vscode/
+.idea/
+*.swp

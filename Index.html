@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base target="_top">
+  <title>Tính ngày giường BHYT</title>
+  <style>
+    :root{--ink:#183c41;--muted:#577078;--brand:#12696c;--light:#e9f5f2;--line:#d7e4e6;--bg:#f3f7f8;--amber:#8b4b0b;--amberbg:#fff4df;--red:#b02936}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Arial,Helvetica,sans-serif}button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #e39e32;outline-offset:3px}[hidden]{display:none!important}a{color:var(--brand)}
+    .top{background:#124c50;color:white;padding:24px max(22px,calc((100vw - 1180px)/2)) 26px}.topline{display:flex;gap:18px;align-items:center;justify-content:space-between}.brandtag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}.top h1{font-size:29px;line-height:1.2;margin:7px 0 9px;font-weight:700}.top p{margin:0;color:#cde4e3;font-size:14px}.pill{border:1px solid #558083;border-radius:30px;padding:7px 12px;white-space:nowrap;font-size:12px}.wrap{max-width:1180px;margin:22px auto;padding:0 22px 45px}.layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:22px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:23px;box-shadow:0 3px 14px #183c4105;margin-bottom:18px;min-width:0}.card h2{margin:0 0 4px;font-size:19px}.sub{color:var(--muted);font-size:13px;margin:0 0 19px}.section-title{display:flex;align-items:center;gap:10px;margin-bottom:14px}.step{height:28px;width:28px;display:inline-grid;place-items:center;background:var(--light);color:var(--brand);font-weight:700;border-radius:9px;font-size:13px;flex-shrink:0}.section-title h2{margin:0}.field{display:flex;flex-direction:column;gap:6px;min-width:0;margin-bottom:15px}.field label{font-size:13px;font-weight:700}.field small,.hint{font-size:12px;color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.full{grid-column:1/-1}input,select{width:100%;min-width:0;border:1px solid #bbced1;border-radius:9px;background:white;color:var(--ink);padding:11px 10px;min-height:45px;font-size:16px}input:focus,select:focus{outline:2px solid #78bdbc;outline-offset:1px}input[readonly]{background:#eef3f5;color:#667f85}.toggle{display:grid;grid-template-columns:1fr 1fr;background:#edf3f4;padding:4px;border-radius:11px;gap:4px;margin-bottom:20px}.toggle button{border:0;background:transparent;border-radius:8px;padding:11px 8px;color:var(--muted);font-weight:700;font-size:13px}.toggle button.active{background:#fff;color:var(--brand);box-shadow:0 1px 5px #12383d16}.ward{border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0;background:#fcfefe}.ward-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px}.ward-head strong{font-size:14px}.ward .field:last-child{margin-bottom:0}.remove{background:none;border:0;color:var(--red);padding:5px;font-size:13px}.linkbtn{border:0;background:none;color:var(--brand);padding:3px 0;font-size:12px;text-align:left}.btn{border:1px solid var(--brand);color:var(--brand);background:white;border-radius:10px;padding:12px 16px;font-weight:700;min-height:46px}.btn.primary{background:var(--brand);color:white}.btn.soft{background:var(--light);border-color:var(--light)}.btn.wide{width:100%}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions .btn{flex:1}.note{border-radius:10px;padding:12px 14px;font-size:13px;background:#edf6f5;border-left:3px solid #64aba9;margin:13px 0}.note.amber{background:var(--amberbg);border-color:#d6a554;color:var(--amber)}.note.error{background:#fff0f1;border-color:var(--red);color:#982834}.note.success{background:#edf8f0;border-color:#48a866;color:#216038}.note p{margin:4px 0}.loading{font-size:13px;padding:11px 15px;background:white;border:1px solid var(--line);border-radius:10px;margin-bottom:18px}details{font-size:13px;margin-top:14px}summary{cursor:pointer;font-weight:700;color:var(--brand);padding:8px 0}details p{color:var(--muted);margin:6px 0 12px}.empty{text-align:center;padding:20px 8px 14px}.empty-mark{font-size:40px;color:var(--brand);font-weight:300;line-height:1.1;margin:6px 0 18px}.empty h3{font-size:19px;margin:7px 0}.empty p{color:var(--muted);font-size:14px}.rule-list{text-align:left;margin:25px 0 0;border-top:1px solid var(--line)}.rule-row{display:flex;gap:14px;justify-content:space-between;border-bottom:1px solid var(--line);padding:13px 0;font-size:13px}.rule-row b{color:var(--brand);white-space:nowrap}.result-head{display:flex;gap:12px;align-items:center;justify-content:space-between}.tag{border-radius:30px;background:var(--light);color:var(--brand);font-size:11px;font-weight:700;padding:6px 9px}.tag.warn{background:var(--amberbg);color:var(--amber)}.metric{padding:20px 0 15px;border-bottom:1px solid var(--line);margin-bottom:18px}.number{font-size:66px;line-height:1;color:var(--brand);font-weight:700;letter-spacing:-3px}.unit{font-size:18px;margin-left:10px}.metric-caption{font-size:12px;color:var(--muted);margin-top:8px}.minimetrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}.minimetrics div{background:#f1f6f6;padding:13px;border-radius:10px;font-size:12px}.minimetrics strong{display:block;font-size:22px;color:var(--ink)}.ward-summary{display:grid;gap:8px;margin:16px 0}.summary-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;background:#f6f9f9;border-radius:8px;font-size:13px}.summary-row b{font-size:16px;white-space:nowrap}.summary-row small{display:block;color:var(--amber);font-size:11px}.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:12px 0}.detail-table{width:100%;border-collapse:collapse;font-size:12px;min-width:450px}.detail-table th{background:#eaf2f3;color:#34565e;text-align:left;padding:10px}.detail-table td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:top}.detail-table td:nth-child(2){font-weight:700;color:var(--brand);min-width:70px}.detail-table small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.result-notes{padding-left:18px;font-size:12px;color:var(--muted)}.result-notes li{margin:8px 0}.footer{font-size:12px;color:var(--muted);margin-top:20px}.stale{opacity:.5}.modehelp{font-size:12px;color:var(--muted);margin:0 0 14px}.toplink{color:#d6eeec;font-size:13px}.saveinfo{font-size:12px;overflow-wrap:anywhere}.previewbadge{background:#fff4df;color:#7a490c}.toolbar{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:14px}.toolbar button{font-size:12px;background:none;border:0;color:var(--brand);padding:5px 0}.status-stay{font-size:12px;color:var(--muted);padding:4px 0 0}.formactions{position:sticky;bottom:0;background:#fffffff2;backdrop-filter:blur(7px);padding:12px 0 0;margin-top:14px}.print-only{display:none}
+    input,select{font-weight:400}.formactions{position:static}.vn-time{display:block;color:var(--brand);font-size:12px;font-weight:400;margin-top:5px}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.wrap{max-width:680px}.top{padding:21px 22px}.resultcol{scroll-margin-top:18px}}
+    @media(max-width:520px){.wrap{padding:0 12px 25px;margin-top:13px}.top{padding:20px 17px}.top h1{font-size:25px}.pill{display:none}.card{padding:17px;border-radius:13px;margin-bottom:13px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.ward{padding:13px}.actions{gap:8px}.btn{padding:11px 12px;font-size:14px}.number{font-size:59px}.detail-table{min-width:0;display:block}.detail-table thead{display:none}.detail-table tbody,.detail-table tr,.detail-table td{display:block;width:100%}.detail-table tr{border-bottom:1px solid var(--line);padding:10px 12px}.detail-table tr:last-child{border-bottom:0}.detail-table td{border:0;padding:4px 0}.detail-table td:nth-child(2):before{content:'Ngày quy đổi: ';font-size:12px;color:var(--muted);font-weight:400}.tablewrap{overflow:visible}.sub{font-size:12px}.topline{gap:6px}.minimetrics{gap:8px}.minimetrics div{padding:10px}}
+    @media print{body{background:#fff}.top{background:#fff;color:#183c41;padding:0 0 15px}.top p,.brandtag{color:#577078}.inputcol,.loading,.toolbar,.saveactions,.footer,.toplink,.pill{display:none!important}.wrap{max-width:none;margin:0;padding:0}.layout{display:block}.card{box-shadow:none;border:0;padding:0}.detail-table{min-width:0}.tablewrap{overflow:visible}details{display:block}details>*{display:block}.print-only{display:block}.number{font-size:42px}.note{break-inside:avoid}.detail-table tr{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<header class="top"><div class="topline"><div><div class="brandtag">Công cụ hỗ trợ nghiệp vụ</div><h1>Tính ngày giường BHYT</h1><p>Nhập một lần · Xem từng khoa · Có diễn giải</p></div><span class="pill">Theo tài liệu TT39/2024</span></div></header>
+<main class="wrap">
+  <div id="connection" class="loading" role="status">Đang kết nối Google Sheet…</div>
+  <div class="toolbar"><span class="hint">Ngày giờ tính theo Việt Nam (UTC+7)</span><button id="sampleBtn" type="button">Điền ví dụ minh họa</button></div>
+  <div class="layout">
+    <section class="inputcol">
+      <form id="form" novalidate>
+        <div class="card">
+          <div class="section-title"><span class="step">1</span><h2>Tiếp nhận người bệnh</h2></div>
+          <p class="sub">Chọn đường đi và nhập thời điểm thực tế.</p>
+          <div class="toggle" role="group" aria-label="Chế độ chuyển khoa"><button type="button" id="singleMode" class="active" aria-pressed="true">Một khoa điều trị</button><button type="button" id="multiMode" aria-pressed="false">Nhiều khoa</button></div>
+          <p id="modeHelp" class="modehelp">Cấp cứu / Phòng khám → 1 khoa điều trị → ra viện.</p>
+          <div class="grid">
+            <div class="field"><label for="origin">Nơi tiếp nhận</label><select id="origin"><option value="PHONG_KHAM">Phòng khám</option><option value="CAP_CUU">Khoa Cấp cứu</option></select></div>
+            <div class="field"><label for="arrival">Ngày giờ vào nơi tiếp nhận</label><input id="arrival" type="datetime-local" step="60" required></div>
+          </div>
+          <div class="field"><label for="caseCode">Mã hồ sơ <span class="hint">(không bắt buộc)</span></label><input id="caseCode" maxlength="80" placeholder="Ví dụ: HS-001" autocomplete="off"><small>Không cần nhập họ tên hoặc thông tin định danh người bệnh.</small></div>
+        </div>
+        <div class="card">
+          <div class="section-title"><span class="step">2</span><h2>Quá trình điều trị</h2></div>
+          <p class="sub">Mỗi thẻ là một lượt nằm khoa; giờ chuyển được nối tự động.</p>
+          <div id="wards"></div>
+          <button type="button" id="addWard" class="btn soft wide" hidden>+ Thêm khoa tiếp theo</button>
+          <div class="field" style="margin-top:20px"><label for="status">Tình trạng ra khoa cuối / ra viện</label><select id="status"></select><small>Chuyển khoa trong cùng bệnh viện không phải “chuyển cơ sở KCB”.</small></div>
+          <div class="field"><label for="admitMode">Mốc vào viện nội trú dùng tính ngày</label><select id="admitMode"><option value="KHOA">Bằng giờ vào khoa điều trị đầu tiên</option><option value="CAP_CUU" hidden>Bằng giờ vào Cấp cứu (hồ sơ ghi nhận nội trú)</option><option value="CUSTOM" hidden>Nhập mốc nội trú riêng trong thời gian Cấp cứu</option></select><small id="admitHint">Dùng giờ vào viện trên hồ sơ. Không cộng thời gian chờ khám vào nội trú.</small></div>
+          <div class="field" id="customAdmission" hidden><label for="admission">Ngày giờ vào viện nội trú trên hồ sơ</label><input id="admission" type="datetime-local" step="60"></div>
+          <details id="emergencyPrice" hidden><summary>Giá giường Cấp cứu (chỉ cần khi từ 3 khoa/ngày)</summary><div class="field"><label for="originPrice">Đồng/ngày; để trống để lấy từ danh mục</label><input id="originPrice" type="number" min="1" max="1000000000" step="1" inputmode="numeric" placeholder="Lấy từ NG_DM_KHOA"></div></details>
+          <div id="formError" class="note error" role="alert" hidden></div>
+          <div class="formactions"><div class="actions"><button type="submit" id="calculate" class="btn primary">Tính ngày giường</button><button type="button" id="clearBtn" class="btn">Nhập ca mới</button></div></div>
+        </div>
+      </form>
+    </section>
+    <section id="resultColumn" class="resultcol" aria-label="Kết quả tính">
+      <div class="card">
+        <div id="empty" class="empty"><div class="empty-mark">01 / ½</div><h3>Ngày giường, rõ từng bước</h3><p>Nhập các mốc bên trái để xem tổng ngày,<br>phần của từng khoa và căn cứ áp dụng.</p><div class="rule-list"><div class="rule-row"><span>Điều trị ≤4 giờ</span><b>0 ngày</b></div><div class="rule-row"><span>Trên 4, dưới 24 giờ</span><b>1 ngày</b></div><div class="rule-row"><span>Chuyển 2 khoa trong ngày</span><b>0,5 mỗi khoa</b></div><div class="rule-row"><span>Từ 3 khoa trong ngày</span><b>Xét giờ + giá</b></div></div><p class="hint">Quy tắc 4 giờ và 24 giờ xét trên đợt nội trú; không làm tròn riêng mỗi lượt khoa.</p></div>
+        <div id="result" hidden aria-live="polite">
+          <div class="result-head"><h2>Kết quả của đợt điều trị</h2><span id="resultTag" class="tag">ĐÃ TÍNH</span></div>
+          <div id="staleNotice" class="note amber" hidden>Dữ liệu đã thay đổi. Bấm “Tính ngày giường” để cập nhật.</div>
+          <div id="resultBody">
+            <div class="metric"><span id="total" class="number">0</span><span class="unit">ngày giường</span><div class="metric-caption">TỔNG TOÀN ĐỢT THEO KHOẢN 1 ĐIỀU 4c</div></div>
+            <div class="note" id="explanation"></div>
+            <div class="minimetrics"><div><strong id="allocated">0</strong>Đã phân bổ dự kiến</div><div><strong id="pending">0</strong>Chờ đối chiếu phân bổ</div></div>
+            <div id="pendingMessage" class="note amber" hidden></div>
+            <h3 style="font-size:15px;margin-bottom:8px">Ngày quy đổi theo khoa</h3><div id="wardSummary" class="ward-summary"></div>
+            <h3 style="font-size:15px;margin:20px 0 7px">Chi tiết và diễn giải</h3>
+            <div class="tablewrap"><table class="detail-table"><thead><tr><th>Ngày · Khoa</th><th>Ngày quy đổi</th><th>Diễn giải</th></tr></thead><tbody id="detailRows"></tbody></table></div>
+            <details id="conventions"><summary>Mốc tính, quy ước và phạm vi</summary><ul id="notes" class="result-notes"></ul></details>
+          </div>
+          <div class="saveactions"><div class="actions" style="margin-top:18px"><button type="button" class="btn primary" id="saveBtn">Lưu vào Google Sheet</button><button type="button" class="btn" id="printBtn">In kết quả</button></div><div id="saveMessage" class="note success saveinfo" role="status" hidden></div></div>
+        </div>
+      </div>
+      <div class="card"><h2 style="font-size:16px">Cách đọc kết quả</h2><p class="hint">“Tổng ngày” tính cho cả đợt. “Ngày quy đổi” là phần giá giường phân cho từng khoa, không phải thời gian nằm thực tế. Không cộng thêm một ngày sau mỗi lần chuyển khoa.</p><details><summary>Vì sao đôi lúc cần đối chiếu?</summary><p>PDF chưa mô tả đầy đủ các tổ hợp: Cấp cứu ≤4 giờ rồi chuyển khoa, đợt &lt;24 giờ qua nửa đêm có chuyển khoa, từ 3 khoa nhưng thiếu giá hoặc ít hơn 2 khoa nằm &gt;4 giờ. Công cụ vẫn tính tổng; phần chưa rõ không tự điền thành 0.</p></details><details><summary>Thiết lập giá khoa một lần</summary><p>Trong Google Sheet, mở <b>NG_DM_KHOA</b>, điền đúng giá giường được phê duyệt tại cột C. Không có giá mẫu. Tải lại giao diện sau khi sửa danh mục. Khi cần, có thể nhập giá riêng tại thẻ khoa của ca đang tính.</p></details><details><summary>Nguồn quy tắc</summary><p>Huong_dan_BHYT_3_phan_v3_bo_sung_PT_TT.pdf, trang 4, 9 và 10. Đối chiếu Điều 4c Thông tư 35/2016/TT-BYT được bổ sung bởi Thông tư 39/2024/TT-BYT. Phiên bản 1.0.0, ngày 29/09/2026; không tự cập nhật văn bản.</p><a href="https://chinhphu.vn/?docid=211771&amp;pageid=27160" target="_blank" rel="noopener">Xem văn bản tại Cổng thông tin Chính phủ ↗</a></details></div>
+    </section>
+  </div>
+  <footer class="footer">Dữ liệu chỉ được ghi vào Google Sheet khi bấm Lưu. Các trang kết quả là nhật ký tính; sửa ô nhật ký không tự tính lại. <a id="sheetLink" hidden target="_blank" rel="noopener">Mở Google Sheet ↗</a></footer>
+</main>
+<script>
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let cfg = null, multi = false, result = null, calculatedInput = null, requestId = '', saving = false, revision = 0, ready = false;
+  const fallbackStatuses = {RA_VIEN:'Ra viện thông thường',XIN_VE:'Xin về, không diễn biến nặng lên',TU_VONG:'Tử vong khi điều trị nội trú',NANG_XIN_VE:'Nặng lên, gia đình xin về',NANG_CHUYEN_VIEN:'Nặng lên, chuyển cơ sở KCB',QUA_CAP_CUU_CHUYEN:'Qua cấp cứu, vẫn cần nội trú, chuyển cơ sở KCB',CHUYEN_VIEN_KHAC:'Chuyển cơ sở KCB, không thuộc nhóm đặc biệt'};
+  const fmt = x => x === null ? 'Cần đối chiếu' : Number(x).toLocaleString('vi-VN', {maximumFractionDigits:4});
+  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function refreshTimes() {
+    document.querySelectorAll('input[type="datetime-local"]').forEach(el => {
+      let out=el.nextElementSibling;
+      if(!out || !out.classList.contains('vn-time')){out=document.createElement('span');out.className='vn-time';el.insertAdjacentElement('afterend',out);}
+      const m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(el.value);
+      out.textContent=m ? `${m[3]}/${m[2]}/${m[1]} · ${m[4]}:${m[5]}` : 'Ngày/tháng/năm · giờ:phút';
+    });
+  }
+  function rpc(name, ...args) {
+    return new Promise((resolve,reject) => {
+      if (window.NG_PREVIEW_API) return Promise.resolve(window.NG_PREVIEW_API(name,args)).then(resolve,reject);
+      if (!window.google || !google.script || !google.script.run) return reject(new Error('Mở giao diện từ Apps Script hoặc liên kết Ứng dụng web; tệp HTML mở riêng không kết nối Google Sheet.'));
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(e => reject(new Error(e.message || String(e))))[name](...args);
+    });
+  }
+  function markDirty() {
+    refreshTimes();
+    revision++; requestId = ''; $('saveMessage').hidden = true; $('formError').hidden = true;
+    if (result) { $('staleNotice').hidden = false; $('resultBody').classList.add('stale'); $('saveBtn').disabled = true; $('printBtn').disabled = true; }
+  }
+  function makeId() { return 'NG_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,12); }
+  function options() { return (cfg?.wards || [{id:'TM',name:'Nội Tim mạch',price:null},{id:'HSTC',name:'Hồi sức tích cực',price:null},{id:'NOI',name:'Nội tổng hợp',price:null}]).map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.name)}</option>`).join('') + '<option value="CUSTOM_WARD">Nhập khoa khác…</option>'; }
+  function wardCards() { return Array.from($('wards').children); }
+  function addWard(data = {}) {
+    const prior = wardCards().at(-1), node = document.createElement('div'); node.className = 'ward';
+    node.innerHTML = `<div class="ward-head"><strong class="wardLabel"></strong><button class="remove" type="button">Bỏ lượt này</button></div>
+      <div class="field"><label>Khoa điều trị<select class="wardId">${options()}</select></label></div>
+      <div class="field customName" hidden><label>Tên khoa khác<input class="wardName" maxlength="100" placeholder="Nhập tên khoa"></label></div>
+      <div class="grid"><div class="field"><label>Ngày giờ vào khoa<input type="datetime-local" step="60" class="start" required></label><button type="button" class="linkbtn sync" hidden>Lấy giờ ra của khoa trước</button></div><div class="field"><label>Ngày giờ ra khoa<input type="datetime-local" step="60" class="end" required></label></div></div>
+      <div class="status-stay"></div><details><summary>Giá giường tham chiếu (tùy chọn)</summary><div class="field"><label>Đồng/ngày<input class="price" type="number" min="1" max="1000000000" step="1" inputmode="numeric" placeholder="Lấy từ danh mục khoa"></label><small>Chỉ cần để chọn giá cao nhất/thấp nhất khi có từ 3 khoa trong ngày. Nhập số liền, ví dụ 500000.</small></div></details>`;
+    $('wards').appendChild(node);
+    node.querySelector('.wardId').value = data.wardId || (prior ? (cfg?.wards?.find(w=>w.id==='NOI')?.id || 'CUSTOM_WARD') : 'TM');
+    if (!node.querySelector('.wardId').value) node.querySelector('.wardId').value = 'CUSTOM_WARD';
+    node.querySelector('.wardName').value = data.name || '';
+    node.querySelector('.start').value = data.start || prior?.querySelector('.end').value || '';
+    node.querySelector('.end').value = data.end || '';
+    node.querySelector('.price').value = data.price ?? '';
+    node.querySelector('.remove').onclick = () => { node.remove(); numberWards(); markDirty(); };
+    node.querySelector('.sync').onclick = () => { const list = wardCards(), i = list.indexOf(node); if (i) node.querySelector('.start').value = list[i-1].querySelector('.end').value; markDirty(); };
+    node.querySelector('.wardId').onchange = () => { node.querySelector('.customName').hidden = node.querySelector('.wardId').value !== 'CUSTOM_WARD'; };
+    node.querySelector('.wardId').onchange();
+    node.querySelector('.end').addEventListener('change', () => {
+      const list = wardCards(), next = list[list.indexOf(node)+1]; if (next) next.querySelector('.start').value = node.querySelector('.end').value;
+    });
+    numberWards(); refreshTimes();
+  }
+  function numberWards() {
+    const list = wardCards(); list.forEach((node,i) => {
+      node.querySelector('.wardLabel').textContent = 'Khoa ' + (i+1);
+      node.querySelector('.remove').hidden = list.length === 1;
+      node.querySelector('.sync').hidden = i === 0;
+      node.querySelector('.status-stay').textContent = i === list.length-1 ? 'Khoa cuối: dùng tình trạng ra viện bên dưới.' : 'Ra khoa: chuyển khoa nội bộ.';
+    });
+  }
+  function setMode(isMulti) {
+    if (!isMulti && wardCards().length > 1) { showError('Đang có nhiều khoa. Bỏ các lượt dư trước khi chuyển về chế độ một khoa.'); return; }
+    multi = isMulti;
+    $('singleMode').classList.toggle('active',!multi); $('singleMode').setAttribute('aria-pressed',String(!multi));
+    $('multiMode').classList.toggle('active',multi); $('multiMode').setAttribute('aria-pressed',String(multi));
+    $('addWard').hidden = !multi;
+    $('modeHelp').textContent = multi ? 'Cấp cứu / Phòng khám → nhiều khoa, kể cả trên 2 khoa trong một ngày → ra viện.' : 'Cấp cứu / Phòng khám → 1 khoa điều trị → ra viện.';
+    markDirty();
+  }
+  function updateOrigin() {
+    const emergency = $('origin').value === 'CAP_CUU';
+    Array.from($('admitMode').options).forEach(o => { if(o.value !== 'KHOA') { o.hidden = !emergency; o.disabled = !emergency; } });
+    if (!emergency) $('admitMode').value = 'KHOA';
+    $('emergencyPrice').hidden = !emergency;
+    $('customAdmission').hidden = $('admitMode').value !== 'CUSTOM';
+    $('admission').required = ! $('customAdmission').hidden;
+    $('admitHint').textContent = emergency ? 'Mặc định từ khoa điều trị. Nếu hồ sơ ghi nhận nội trú từ Cấp cứu, chọn đúng mốc tương ứng để cộng thời gian đó.' : 'Dùng giờ vào viện trên hồ sơ. Không cộng thời gian chờ khám vào nội trú.';
+  }
+  function payload() {
+    return {origin:$('origin').value, arrival:$('arrival').value, caseCode:$('caseCode').value, admitMode:$('admitMode').value, admission:$('admission').value, status:$('status').value, originPrice:$('originPrice').value,
+      stays:wardCards().map(node => {
+        const id = node.querySelector('.wardId').value, c = cfg?.wards.find(w => w.id === id), custom = node.querySelector('.wardName').value.trim();
+        if (id === 'CUSTOM_WARD' && !custom) throw new Error('Nhập tên khoa ở lựa chọn Khoa khác.');
+        return {wardId:id === 'CUSTOM_WARD' ? 'USER_' + custom.normalize('NFC').toLocaleLowerCase('vi-VN') : id,name:c?.name || custom,start:node.querySelector('.start').value,end:node.querySelector('.end').value,price:node.querySelector('.price').value};
+      })};
+  }
+  function showError(message) { $('formError').textContent = message; $('formError').hidden = false; }
+  function render(r) {
+    result = r; $('empty').hidden = true; $('result').hidden = false; $('staleNotice').hidden = true; $('resultBody').classList.remove('stale');
+    $('resultTag').textContent = r.pendingDays ? 'CẦN ĐỐI CHIẾU' : 'PHÂN BỔ DỰ KIẾN'; $('resultTag').className = 'tag' + (r.pendingDays ? ' warn' : '');
+    $('total').textContent = fmt(r.totalDays); $('allocated').textContent = fmt(r.allocatedDays); $('pending').textContent = fmt(r.pendingDays); $('explanation').textContent = r.explanation;
+    $('pendingMessage').hidden = !r.pendingDays; $('pendingMessage').textContent = `Tổng ${fmt(r.totalDays)} ngày đã tính theo mốc nhập. Còn ${fmt(r.pendingDays)} ngày cần đối chiếu cách phân bổ; xem lý do ở từng dòng dưới đây.`;
+    $('wardSummary').innerHTML = r.byWard.map(w => `<div class="summary-row"><span>${escapeHtml(w.ward)}${w.hasPending?'<small>Còn phần chưa xác định</small>':''}</span><b>${fmt(w.days)}${w.hasPending?' + ?':''}</b></div>`).join('');
+    $('detailRows').innerHTML = r.details.map(d => `<tr><td><b>${escapeHtml(d.ward)}</b><small>${escapeHtml(d.date)} · ${fmt(d.hours)} giờ</small></td><td>${fmt(d.days)}</td><td>${escapeHtml(d.explanation)}<small>${escapeHtml(d.basis)}</small></td></tr>`).join('');
+    $('notes').innerHTML = r.notes.map(n => '<li>' + escapeHtml(n) + '</li>').join('');
+    $('saveBtn').disabled = false; $('printBtn').disabled = false;
+  }
+  $('form').addEventListener('input',markDirty); $('form').addEventListener('change',markDirty);
+  $('origin').onchange = updateOrigin; $('admitMode').onchange = updateOrigin;
+  $('singleMode').onclick = () => setMode(false); $('multiMode').onclick = () => setMode(true);
+  $('addWard').onclick = () => { if(wardCards().length >= 100) return showError('Tối đa 100 lượt khoa.'); addWard(); markDirty(); };
+  $('form').onsubmit = async e => {
+    e.preventDefault(); $('formError').hidden = true;
+    if (!ready) return showError('Chưa kết nối Google Sheet. Kiểm tra thông báo phía trên.');
+    if (!$('form').reportValidity()) return;
+    const rev = revision;
+    try {
+      const p = payload(); $('calculate').disabled = true; $('calculate').textContent = 'Đang tính…'; $('saveBtn').disabled = true;
+      const r = await rpc('tinhNgayGiuong',p);
+      if (rev !== revision) { showError('Dữ liệu đã đổi trong lúc tính. Bấm Tính lại để dùng dữ liệu mới.'); return; }
+      calculatedInput = p; requestId = makeId(); $('saveMessage').hidden = true; render(r);
+      if (window.innerWidth < 901) $('resultColumn').scrollIntoView({behavior:'smooth',block:'start'});
+    } catch(err) { showError(err.message); }
+    finally { $('calculate').disabled = false; $('calculate').textContent = 'Tính ngày giường'; }
+  };
+  $('saveBtn').onclick = async () => {
+    if (saving || !result || !requestId || !$('staleNotice').hidden) return;
+    saving = true; const rev = revision; $('saveBtn').disabled = true; $('saveMessage').hidden = true;
+    try {
+      const saved = await rpc('luuKetQua', calculatedInput, requestId);
+      if (rev !== revision) { $('saveMessage').className='note amber saveinfo'; $('saveMessage').textContent='Đã lưu bản tính trước khi bạn sửa dữ liệu. Bấm Tính lại để lưu dữ liệu mới.'; }
+      else { if (saved.result) render(saved.result); $('saveBtn').disabled = true; $('saveMessage').className='note success saveinfo'; $('saveMessage').textContent=(saved.alreadySaved?'Bản tính này đã được lưu. ':'Đã lưu kết quả và diễn giải. ') + 'Mã: ' + saved.id; }
+      $('saveMessage').hidden = false;
+    } catch(err) { $('saveMessage').className='note error saveinfo'; $('saveMessage').textContent=err.message; $('saveMessage').hidden=false; $('saveBtn').disabled=!!$('staleNotice').offsetParent; }
+    finally { saving=false; }
+  };
+  $('printBtn').onclick = () => { const old=$('conventions').open; $('conventions').open=true; window.print(); $('conventions').open=old; };
+  $('clearBtn').onclick = () => {
+    if (saving) return showError('Đang lưu, vui lòng chờ hoàn tất.');
+    $('form').reset(); $('wards').innerHTML=''; addWard(); result=null; calculatedInput=null; requestId=''; revision++;
+    $('result').hidden=true; $('empty').hidden=false; $('saveMessage').hidden=true; $('formError').hidden=true; setMode(false); updateOrigin();
+  };
+  $('sampleBtn').onclick = () => {
+    if (saving) return;
+    $('origin').value='PHONG_KHAM'; $('arrival').value='2026-09-01T06:30'; $('caseCode').value='VI-DU-KHONG-PHAI-NGUOI-BENH'; $('admitMode').value='KHOA'; $('status').value='RA_VIEN';
+    $('wards').innerHTML=''; addWard({wardId:'TM',start:'2026-09-01T08:00',end:'2026-09-02T12:00'}); addWard({wardId:'NOI',start:'2026-09-02T12:00',end:'2026-09-04T10:00'}); setMode(true); updateOrigin(); markDirty();
+  };
+  async function init() {
+    $('status').innerHTML=Object.entries(fallbackStatuses).map(([k,v])=>`<option value="${k}">${escapeHtml(v)}</option>`).join('');
+    $('calculate').disabled=true;
+    try {
+      cfg=await rpc('layCauHinh'); ready=true;
+      $('status').innerHTML=Object.entries(cfg.statuses).map(([k,v])=>`<option value="${k}">${escapeHtml(v)}</option>`).join('');
+      $('connection').textContent=window.NG_PREVIEW_API?'Bản kiểm thử cục bộ · chưa kết nối tài khoản Google':'Đã kết nối · Nhập dữ liệu, tính và lưu ngay trên giao diện';
+      if(window.NG_PREVIEW_API) $('connection').classList.add('previewbadge');
+      if(cfg.sheetUrl){$('sheetLink').href=cfg.sheetUrl; $('sheetLink').hidden=false;}
+    } catch(err) { $('connection').textContent=err.message; $('connection').classList.add('note','error'); }
+    addWard(); updateOrigin(); $('calculate').disabled=!ready;
+  }
+  init();
+</script>
+</body>
+</html>

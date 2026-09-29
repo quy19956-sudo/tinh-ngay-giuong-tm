@@ -1,0 +1,62 @@
+KẾT QUẢ KIỂM THỬ - TÍNH NGÀY GIƯỜNG BHYT 1.0.0
+Ngày: 29/09/2026
+
+Bộ tính: 45 ca đạt; 0 ca lỗi.
+
+ĐẠT: 3 giờ 59 phút
+ĐẠT: Đúng 4 giờ
+ĐẠT: 4 giờ 1 phút
+ĐẠT: 23 giờ 59 phút
+ĐẠT: Đúng 24 giờ thông thường
+ĐẠT: Đúng 24 giờ tử vong
+ĐẠT: 3,5 giờ tử vong vẫn không tính
+ĐẠT: 20 giờ tử vong qua ngày vẫn 1
+ĐẠT: Ví dụ PDF 01/6 ra 05/6
+ĐẠT: Ví dụ PDF 01/6 tử vong 05/6
+ĐẠT: Nặng xin về
+ĐẠT: Nặng chuyển viện
+ĐẠT: Qua cấp cứu còn cần nội trú chuyển viện
+ĐẠT: Nhẹ xin về không cộng 1
+ĐẠT: Chuyển viện khác không cộng 1
+ĐẠT: Năm nhuận
+ĐẠT: Qua năm
+ĐẠT: Không làm tròn giờ/24
+ĐẠT: Không cộng thời gian phòng khám
+ĐẠT: 2 khoa không áp >4 giờ riêng từng khoa
+ĐẠT: Chuyển đúng 00:00 không đếm hai khoa ngày trước
+ĐẠT: 3 khoa lấy giá cao nhất và thấp nhất
+ĐẠT: 3 khoa, đúng 4 giờ bị loại khỏi nhóm giá
+ĐẠT: 3 khoa thiếu giá: tổng vẫn có, phân bổ chờ
+ĐẠT: 3 khoa đồng giá cần xác nhận khoa
+ĐẠT: 3 khoa đều đúng 4 giờ
+ĐẠT: Đợt ngắn qua nửa đêm chuyển khoa
+ĐẠT: Cấp cứu >4 giờ thuộc nội trú + 1 khoa
+ĐẠT: Cấp cứu đúng 4 giờ không tự suy diễn phần còn lại
+ĐẠT: Mốc nội trú từ khoa: CC trước mốc không cộng
+ĐẠT: Tử vong đúng 00:00 vẫn giữ tổng, chờ phân bổ ngày cuối
+ĐẠT: Quay lại cùng khoa trong ngày: 2 khoa duy nhất
+ĐẠT: Ngày 31/2
+ĐẠT: Ra trước vào
+ĐẠT: Lượt 0 phút
+ĐẠT: Tiếp nhận sau vào khoa
+ĐẠT: Chồng lấn giờ chuyển
+ĐẠT: Khoảng trống giờ chuyển
+ĐẠT: Không dùng chuyển khoa thay ra viện
+ĐẠT: Chặn khóa tình trạng không hợp lệ
+ĐẠT: Giá âm
+ĐẠT: Giá dạng chữ
+ĐẠT: Phòng khám không chọn mốc CC
+ĐẠT: Tên/mã khoa đặc biệt không phá bảng tổng
+ĐẠT: Chặn công thức trong dữ liệu văn bản
+
+KIỂM THỬ LƯU DỮ LIỆU BẰNG DỊCH VỤ GOOGLE MÔ PHỎNG
+PASS: khởi tạo lặp không xóa, ghi đúng bảng, chống lưu lặp, chống công thức, rollback lỗi ghi, thử lại, chặn bảng sai cấu trúc
+
+GIAO DIỆN CHROMIUM CỤC BỘ
+ĐẠT ở chiều rộng 1280px: Bố cục, ví dụ 3 ngày, lưu, kết quả hết hạn khi sửa, nhập mới, đúng 4 giờ, tự nối mốc chuyển.
+ĐẠT ở chiều rộng 390px: Bố cục, ví dụ 3 ngày, lưu, kết quả hết hạn khi sửa, nhập mới, đúng 4 giờ, tự nối mốc chuyển.
+ĐẠT ở chiều rộng 360px: Bố cục, ví dụ 3 ngày, lưu, kết quả hết hạn khi sửa, nhập mới, đúng 4 giờ, tự nối mốc chuyển.
+
+Giới hạn: Dịch vụ Google được mô phỏng cục bộ; chưa triển khai hoặc kiểm thử trong tài khoản Google thực.
+Mã nguồn Code.gs và mã JavaScript trong Index.html đã được phân tích cú pháp thành công.
+Không có lỗi JavaScript phía giao diện trong các luồng đã kiểm tra.
