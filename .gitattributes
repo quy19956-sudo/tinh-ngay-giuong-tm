@@ -1,6 +1,5 @@
-* text=auto eol=lf
-*.gs text eol=lf
+*.html linguist-detectable=false
+*.js linguist-detectable=true
+*.js text eol=lf
 *.html text eol=lf
 *.md text eol=lf
-*.json text eol=lf
-*.txt text eol=lf
