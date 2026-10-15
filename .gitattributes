@@ -1,5 +1,0 @@
-*.html linguist-detectable=false
-*.js linguist-detectable=true
-*.js text eol=lf
-*.html text eol=lf
-*.md text eol=lf
