@@ -6,7 +6,7 @@
 'use strict';
 
 var NG = {
-  version: '2.0.0',
+  version: '2.1.0',
   tz: 'Asia/Ho_Chi_Minh',
   day: 86400000,
   hour: 3600000,
@@ -23,7 +23,6 @@ var NG = {
   special: ['TU_VONG', 'NANG_XIN_VE', 'NANG_CHUYEN_VIEN', 'QUA_CAP_CUU_CHUYEN'],
   wards: [
     {id:'CC', name:'Cấp cứu', price:null},
-    {id:'PK', name:'Phòng khám', price:null},
     {id:'TM', name:'Nội Tim mạch', price:null},
     {id:'HSTC', name:'Hồi sức tích cực', price:null},
     {id:'NOI', name:'Nội tổng hợp', price:null},
@@ -44,6 +43,17 @@ function parseTime_(s, label) {
   return t;
 }
 function pad_(n) { return String(n).padStart(2, '0'); }
+function clock24_(value) {
+  var s = String(value == null ? '' : value).trim();
+  var m = /^(\d{1,2}):(\d{2})$/.exec(s);
+  if (!m && /^\d{3,4}$/.test(s)) m = [s, s.slice(0, -2), s.slice(-2)];
+  if (!m || +m[1] > 23 || +m[2] > 59) throw new Error('Nhập giờ 24h từ 00:00 đến 23:59, ví dụ 07:30 hoặc 18:45 (có thể gõ 0730 hoặc 1845).');
+  return pad_(+m[1]) + ':' + pad_(+m[2]);
+}
+function clinic_(name) {
+  var s = String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().trim().replace(/^khoa\s+/, '');
+  return /^(phong kham|kham benh)(\s|$)/.test(s);
+}
 function day_(t) { return Math.floor(t / NG.day) * NG.day; }
 function date_(t) { var d = new Date(t); return pad_(d.getUTCDate()) + '/' + pad_(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
 function fmt_(t) { var d = new Date(t); return date_(t) + ' ' + pad_(d.getUTCHours()) + ':' + pad_(d.getUTCMinutes()); }
@@ -67,6 +77,7 @@ function normalize_(p) {
   var stays = p.stays.map(function (s, i) {
     var id = text_(s.wardId, 140, 'Mã khoa'), name = text_(s.name, 100, 'Tên khoa');
     if (!id || !name) throw new Error('Lượt ' + (i + 1) + ': thiếu tên/mã khoa.');
+    if (id === 'PK' || clinic_(name)) throw new Error('Phòng khám không phải khoa có giường, không được nhập thành lượt giường điều trị.');
     if (id === '__CAP_CUU__') throw new Error('Mã khoa đã được dành riêng.');
     if (names[id] && names[id] !== name) throw new Error('Cùng mã khoa phải có cùng tên: ' + id);
     names[id] = name;
@@ -78,13 +89,14 @@ function normalize_(p) {
   stays.forEach(function (s, i) {
     if (i && s.start !== stays[i - 1].end) throw new Error('Lượt ' + (i + 1) + ': giờ vào phải trùng giờ ra khoa trước; cần sửa khoảng trống hoặc chồng lấn.');
   });
-  // Theo quy ước người dùng: vào Cấp cứu HOẶC vào từ Phòng khám đều bắt đầu nội trú.
+  // Mốc vào viện nội trú trên hồ sơ: tại Cấp cứu hoặc vào từ Phòng khám.
+  // Phòng khám là đường vào viện, không tạo một lượt giường.
   var admit = arrival;
   if (admit < arrival || admit > stays[0].start) throw new Error('Mốc vào viện phải nằm từ lúc tiếp nhận đến lúc vào khoa đầu tiên.');
   var end = stays[stays.length - 1].end;
   if (end - admit > 3660 * NG.day) throw new Error('Khoảng điều trị vượt 10 năm; kiểm tra lại ngày nhập.');
   return { origin: p.origin, arrival: arrival, admit: admit, end: end, status: p.status, stays: stays,
-    caseCode: text_(p.caseCode, 80, 'Mã hồ sơ'), originPrice: price_(p.originPrice, 'Giá khoa tiếp nhận'),
+    caseCode: text_(p.caseCode, 80, 'Mã hồ sơ'), originPrice: p.origin === 'CAP_CUU' ? price_(p.originPrice, 'Giá Cấp cứu') : null,
     originWardId: text_(p.originWardId || (p.origin === 'CAP_CUU' ? 'CC' : 'PK'), 140, 'Mã khoa tiếp nhận'),
     originName: text_(p.originName || (p.origin === 'CAP_CUU' ? 'Cấp cứu' : 'Phòng khám'), 100, 'Tên khoa tiếp nhận') };
 }
@@ -103,21 +115,30 @@ function groups_(segments, from, to) {
     var a = Math.max(from, s.start), b = Math.min(to, s.end);
     if (b <= a) return;
     var g = map[s.wardId];
-    if (!g) { g = { id: s.wardId, name: s.name, ms: 0, price: s.price, priceConflict: false, excluded: s.excluded || false }; map[s.wardId] = g; list.push(g); }
+    if (!g) { g = { id: s.wardId, name: s.name, ms: 0, price: s.price, priceConflict: false, emergency: s.emergency === true, excluded: s.excluded === true }; map[s.wardId] = g; list.push(g); }
     if (g.price !== s.price) g.priceConflict = true;
     g.ms += b - a;
   });
   return list;
 }
 function allocate_(groups, label) {
-  var rows = groups.map(function (g) { return { date: label, ward: g.name, hours: hours_(g.ms), days: 0, price: g.price, explanation: '', basis: 'Khoản 2 Điều 4c' }; });
-  function pending(message) {
-    rows.forEach(function (r, i) { r.days = groups[i].excluded ? 0 : null; r.explanation = message + (groups[i].excluded ? ' Cấp cứu ≤4 giờ: không thanh toán giường hồi sức cấp cứu.' : ''); });
-    if (!rows.length) rows.push({ date: label, ward: 'Cần xác minh', hours: 0, days: null, price: null, explanation: message, basis: 'Khoản 1, 2 Điều 4c' });
+  var rows = groups.map(function (g) { return { date: label, ward: g.name, hours: hours_(g.ms), days: 0, price: g.price, emergency:g.emergency, excluded:g.excluded, explanation: '', basis: 'Khoản 2 Điều 4c' }; });
+  function pending(message, code) {
+    rows.forEach(function (r, i) {
+      if (groups[i].excluded) {
+        r.days = 0;
+        r.explanation = 'Riêng lượt Cấp cứu ≤4 giờ: không thanh toán giường hồi sức cấp cứu. Không áp loại trừ này cho khoa khác.';
+        r.basis = 'Điểm c khoản 1 Điều 4c';
+      } else {
+        r.days = null; r.pendingReason = code;
+        r.explanation = r.ward + ' có ' + r.hours + ' giờ nằm trong ngày. ' + message;
+      }
+    });
+    if (!rows.some(function(r){return r.days === null;})) rows.push({ date: label, ward: 'Chưa xác định khoa', hours: 0, days: null, price: null, pendingReason:code, explanation:message, basis:'Khoản 1, 2 Điều 4c' });
     return { rows: rows, pending: 1 };
   }
-  if (!groups.length) return pending('Không có thời gian nằm thực tế trong ngày này (ví dụ ra viện đúng 00:00). Tổng ngày vẫn theo khoản 1; cần xác nhận khoa nhận phân bổ.');
-  if (groups.some(function (g) { return g.excluded; })) return pending('Có lượt Cấp cứu ≤4 giờ trong khoảng nội trú. Điều 4c chưa mô tả rõ cách kết hợp phần loại trừ với phân bổ chuyển khoa; cần đối chiếu phần của khoa còn lại.');
+  if (!groups.length) return pending('Chưa có thời gian nằm tại khoa có giường trong ngày này, hoặc kết thúc đúng 00:00. Cần đối chiếu hồ sơ để gán khoa; không tạo giường Phòng khám.', 'MISSING_WARD');
+  if (groups.length <= 2 && groups.some(function (g) { return g.excluded; })) return pending('Cần xác nhận phần phân bổ khi một lượt giường không được thanh toán. Khoa thông thường không bị loại chỉ vì lượt nằm ≤4 giờ; không tự chuyển phần không thanh toán sang khoa này.', 'CC_EXCLUSION_SPLIT');
   if (groups.length === 1) {
     rows[0].days = 1; rows[0].explanation = 'Một khoa trong ngày tính giường: phân bổ 1 ngày theo quy ước tính ngày vào, bỏ ngày ra thông thường.'; rows[0].basis = 'Khoản 1 Điều 4c; quy ước phân bổ của công cụ'; return { rows: rows, pending: 0 };
   }
@@ -125,16 +146,16 @@ function allocate_(groups, label) {
     rows.forEach(function (r) { r.days = 0.5; r.explanation = 'Chuyển 2 khoa trong cùng ngày: mỗi khoa 0,5 ngày; không áp ngưỡng >4 giờ của trường hợp từ 3 khoa.'; });
     return { rows: rows, pending: 0 };
   }
-  var eligible = groups.map(function (g, i) { return { g: g, i: i }; }).filter(function (a) { return a.g.ms > 4 * NG.hour; });
-  if (eligible.length < 2) return pending('Có từ 3 khoa nhưng ít hơn 2 khoa nằm >4 giờ trong ngày. Chưa đủ căn cứ phân bổ tự động tình huống này.');
-  if (eligible.some(function (a) { return a.g.price === null || a.g.priceConflict; })) return pending('Có từ 3 khoa: cần giá giường hợp lệ, thống nhất trong ngày của tất cả khoa nằm >4 giờ để xác định giá cao nhất/thấp nhất.');
+  var eligible = groups.map(function (g, i) { return { g: g, i: i }; }).filter(function (a) { return !a.g.excluded && a.g.ms > 4 * NG.hour; });
+  if (eligible.length < 2) return pending('Ngày có từ 3 khoa nhưng ít hơn 2 khoa nằm >4 giờ để chọn giá cao nhất/thấp nhất theo khoản 2. Cần đối chiếu cách phân bổ ngày này.', 'THREE_TOO_FEW');
+  if (eligible.some(function (a) { return a.g.price === null || a.g.priceConflict; })) return pending('Ngày có từ 3 khoa: cần giá của các khoa nằm >4 giờ để chọn giá cao nhất/thấp nhất.', 'THREE_MISSING_PRICE');
   var prices = eligible.map(function (a) { return a.g.price; }), low = Math.min.apply(null, prices), high = Math.max.apply(null, prices);
   var lows = eligible.filter(function (a) { return a.g.price === low; }), highs = eligible.filter(function (a) { return a.g.price === high; });
-  if (eligible.length > 2 && (lows.length > 1 || highs.length > 1)) return pending('Nhiều khoa cùng mức giá cao nhất/thấp nhất. Giá bình quân xác định được (' + ((low + high) / 2) + ' đồng), nhưng cần xác nhận khoa được ghi nhận; không tự chọn khoa khi đồng giá.');
+  if (eligible.length > 2 && (lows.length > 1 || highs.length > 1)) return pending('Nhiều khoa cùng mức giá cao nhất/thấp nhất. Giá bình quân xác định được (' + ((low + high) / 2) + ' đồng), nhưng cần xác nhận khoa được ghi nhận; không tự chọn khoa khi đồng giá.', 'THREE_PRICE_TIE');
   var chosen = eligible.length === 2 ? [eligible[0].i, eligible[1].i] : [lows[0].i, highs[0].i];
   rows.forEach(function (r, i) {
     r.days = chosen.indexOf(i) >= 0 ? 0.5 : 0;
-    r.explanation = groups[i].ms <= 4 * NG.hour ? 'Từ 3 khoa trong ngày: khoa này nằm ≤4 giờ, không thuộc nhóm chọn giá.' :
+    r.explanation = groups[i].excluded ? 'Riêng lượt Cấp cứu ≤4 giờ: không thanh toán giường hồi sức cấp cứu.' : groups[i].ms <= 4 * NG.hour ? 'Từ 3 khoa trong ngày: khoa này nằm ≤4 giờ, không thuộc nhóm chọn giá theo khoản 2.' :
       r.days ? 'Thuộc 2 khoa được chọn giá cao nhất/thấp nhất trong nhóm >4 giờ; 0,5 ngày quy đổi. Giá bình quân ngày = ' + ((low + high) / 2) + ' đồng.' : 'Nằm >4 giờ nhưng giá không phải mức cao nhất hoặc thấp nhất: 0 ngày quy đổi tại khoa này.';
   });
   return { rows: rows, pending: 0 };
@@ -143,14 +164,12 @@ function tinhCotLoi_(input) {
   var n = normalize_(input), total = total_(n.admit, n.end, n.status), segments = n.stays.slice(), details = [], notes = [], pending = 0;
   var before = n.stays[0].start - n.arrival;
   notes.push('Mốc dùng tính: ' + fmt_(n.admit) + '. Phải khớp ngày giờ vào viện nội trú trên hồ sơ.');
-  if (n.origin === 'PHONG_KHAM') notes.push('Theo quy ước người dùng: ngày giờ vào từ Phòng khám là mốc bắt đầu nội trú; đây là cấu hình của công cụ, không phải kết luận chung về thanh toán thời gian khám ngoại trú.');
-  if (n.admit < n.stays[0].start) {
-    segments.unshift({ wardId: n.originWardId, name: n.originName, start: n.admit, end: n.stays[0].start, price: n.originPrice, emergency: n.origin === 'CAP_CUU', excluded: n.origin === 'CAP_CUU' && before <= 4 * NG.hour });
+  if (n.origin === 'PHONG_KHAM') notes.push('Phòng khám là đường vào viện, không có giường: không tạo khoa, đơn giá hoặc phần 0,5 ngày cho Phòng khám. Mốc tiếp nhận phải là giờ vào viện nội trú trên hồ sơ, không phải giờ đăng ký khám ngoại trú.');
+  if (n.origin === 'CAP_CUU' && n.admit < n.stays[0].start) {
+    segments.unshift({ wardId: n.originWardId, name: n.originName, start: n.admit, end: n.stays[0].start, price: n.originPrice, emergency: true, excluded: before <= 4 * NG.hour });
   }
-  if (n.admit > n.arrival || before === 0) {
-    details.push({ date: date_(n.arrival), ward: n.origin === 'CAP_CUU' ? 'Cấp cứu (trước mốc nội trú)' : 'Phòng khám', hours: hours_(n.admit - n.arrival), days: 0, price: null,
-      explanation: 'Khoảng trước mốc nội trú đã chọn: không cộng vào kết quả đợt này.' + (n.origin === 'CAP_CUU' && before <= 4 * NG.hour ? ' Lượt Cấp cứu ≤4 giờ: không thanh toán giường hồi sức cấp cứu theo điểm c.' : ''), basis: n.origin === 'CAP_CUU' ? 'Mốc hồ sơ; điểm c khoản 1 Điều 4c khi đủ điều kiện' : 'Phân biệt ngoại trú và nội trú' });
-    if (n.origin === 'CAP_CUU' && before > 4 * NG.hour) notes.push('Có >4 giờ ở Cấp cứu trước mốc nội trú. Kiểm tra hồ sơ: nếu thời gian này thuộc đợt nội trú, phải đổi mốc vào viện; công cụ hiện chưa cộng khoảng đó.');
+  if (n.origin === 'CAP_CUU' && before === 0) {
+    details.push({date:date_(n.arrival),ward:n.originName,hours:0,days:0,price:n.originPrice,emergency:true,excluded:false,explanation:'Chuyển ngay vào khoa điều trị, không có thời gian nằm riêng tại Cấp cứu.',basis:'Mốc thực tế trên hồ sơ'});
   }
   if (!total.days) {
     groups_(segments, n.admit, n.end).forEach(function (g) { details.push({ date: date_(n.admit) + (day_(n.end) !== day_(n.admit) ? ' – ' + date_(n.end) : ''), ward: g.name, hours: hours_(g.ms), days: 0, price: g.price, explanation: 'Cả đợt nội trú ≤4 giờ: 0 ngày giường, kể cả tình trạng ra viện thuộc nhóm đặc biệt.', basis: total.basis }); });
@@ -160,7 +179,7 @@ function tinhCotLoi_(input) {
       details.push({ date: label, ward: gs[0].name, hours: hours_(gs[0].ms), days: 1, price: gs[0].price, explanation: 'Đợt >4 và <24 giờ qua nửa đêm, chỉ một khoa: toàn đợt tính 1 ngày, không tách thành 2 ngày.', basis: total.basis });
     } else {
       pending = 1;
-      gs.forEach(function (g) { details.push({ date: label, ward: g.name, hours: hours_(g.ms), days: g.excluded ? 0 : null, price: g.price, explanation: 'Toàn đợt <24 giờ qua nửa đêm có chuyển khoa: tổng là 1 ngày; Điều 4c chưa mô tả rõ cách ghép phân bổ giữa hai ngày lịch. Cần đối chiếu.' + (g.excluded ? ' Cấp cứu ≤4 giờ: không tính giường hồi sức cấp cứu.' : ''), basis: 'Điểm c khoản 1 và khoản 2 Điều 4c' }); });
+      gs.forEach(function (g) { details.push({ date: label, ward: g.name, hours: hours_(g.ms), days: g.excluded ? 0 : null, price: g.price, emergency:g.emergency,excluded:g.excluded,pendingReason:g.excluded?'':'SHORT_OVERNIGHT',explanation:g.excluded?'Riêng lượt Cấp cứu ≤4 giờ: không thanh toán giường hồi sức cấp cứu.':'Toàn đợt <24 giờ qua nửa đêm có chuyển khoa: tổng là 1 ngày. Cần đối chiếu cách ghép phân bổ giữa hai ngày lịch.', basis:'Điểm c khoản 1 và khoản 2 Điều 4c' }); });
     }
   } else {
     var startDay = day_(n.admit);
@@ -199,7 +218,7 @@ function inputWithCatalogLocal_(input) {
     }
     return s;
   });
-  var cc = map[p.originWardId || (p.origin === 'PHONG_KHAM' ? 'PK' : 'CC')];
+  var cc = p.origin === 'CAP_CUU' ? map[p.originWardId || 'CC'] : null;
   if (cc && (p.originPrice === '' || p.originPrice === null || p.originPrice === undefined)) p.originPrice = cc.price;
   return p;
 }
@@ -222,5 +241,6 @@ globalThis.NG_ENGINE = {
   config: layCauHinhLocal_,
   calculate: tinhNgayGiuongLocal_,
   calculateRaw: tinhCotLoi_,
+  normalizeClock: clock24_,
   version: NG.version
 };

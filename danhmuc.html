@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0d756b">
   <title>Danh mục khoa, giá · Tính ngày giường</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="danh-muc.js"></script><script defer src="catalog.js"></script>
-  <script defer src="xlsx.full.min.js"></script><script defer src="catalog-page.js"></script>
+  <link rel="stylesheet" href="style.css?v=2.1.0">
+  <script defer src="danh-muc.js?v=2.1.0"></script><script defer src="catalog.js?v=2.1.0"></script>
+  <script defer src="xlsx.full.min.js?v=2.1.0"></script><script defer src="catalog-page.js?v=2.1.0"></script>
 </head>
 <body>
 <div class="shell">
@@ -13,7 +13,7 @@
   <main>
     <div class="page-title"><div><h1>Danh mục khoa, giá</h1><p>Excel một sheet · Cột A: tên khoa · Cột B: giá tiền (đồng/ngày)</p></div></div>
     <section class="card catalog-card" aria-label="Cập nhật danh mục">
-      <div class="import-bar"><div><strong>Nhập danh mục từ Excel</strong><p class="muted small">Chọn tệp, kiểm tra bảng rồi bấm Lưu danh mục.</p></div><div class="actions"><button class="btn" id="templateBtn" type="button">Tải Excel mẫu</button><label class="btn primary file-btn" for="excelFile">Chọn tệp Excel<input class="sr-only" id="excelFile" type="file" accept=".xlsx,.xls"></label></div></div>
+      <div class="import-bar"><div><strong>Nhập danh mục từ Excel</strong><p class="muted small">Chỉ nhập khoa có giường; không nhập Phòng khám. Chọn tệp rồi bấm Lưu danh mục.</p></div><div class="actions"><button class="btn" id="templateBtn" type="button">Tải Excel mẫu</button><label class="btn primary file-btn" for="excelFile">Chọn tệp Excel<input class="sr-only" id="excelFile" type="file" accept=".xlsx,.xls"></label></div></div>
       <div id="catalogMessage" class="notice" role="status" hidden></div>
       <div class="catalog-info"><span id="catalogCount" class="muted small"></span><span id="unsaved" class="pill warning-pill" hidden>Chưa lưu</span></div>
       <form id="catalogForm" novalidate>

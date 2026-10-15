@@ -4,7 +4,7 @@
   const C = globalThis.NG_CATALOG;
   const fmt = n => Number(n).toLocaleString('vi-VN', {maximumFractionDigits:4});
   const money = n => fmt(n) + ' đ';
-  let catalog, lastResult = null, lastText = '';
+  let catalog, roles, lastResult = null, lastText = '';
   const statusNames = NG_ENGINE.config().statuses;
   for (const [value, label] of Object.entries(statusNames)) $('status').add(new Option(label, value));
   const getWard = id => catalog.wards.find(w => w.id === $(id).value);
@@ -13,23 +13,28 @@
     $('catalogNotice').hidden = !message;
   }
   function loadCatalog(preserve = false) {
-    const old = Object.fromEntries(['ccWard','middleWard','finalWard'].map(id => [id,$(id).value]));
+    const old = preserve ? $('middleWard').value : '';
     catalog = C.load();
-    for (const id of ['ccWard','middleWard','finalWard']) {
-      $(id).replaceChildren(new Option('Chọn khoa…', ''));
-      for (const w of catalog.wards) $(id).add(new Option(w.name, w.id));
-      const preferred = id === 'ccWard' ? catalog.wards.find(w => ($('origin').value === 'CAP_CUU' ? /cap cuu/ : /phong kham/).test(C.fold(w.name))) : id === 'finalWard' ? catalog.wards.find(w => /tim mach/.test(C.fold(w.name))) : null;
-      if (preserve && catalog.wards.some(w => w.id === old[id])) $(id).value = old[id];
-      else if (preferred) $(id).value = preferred.id;
+    function fixed(keys, id, name) {
+      for (const key of keys) {
+        const matches = catalog.wards.filter(w => C.nameKey(w.name) === key);
+        if (matches.length === 1) return matches[0];
+      }
+      return {id, name, price:null, missing:true};
     }
+    roles = {
+      cc:fixed(['cap cuu','hoi suc cap cuu'], '__CAP_CUU_FIXED__', 'Cấp cứu'),
+      tm:fixed(['noi tim mach','tim mach'], '__NOI_TIM_MACH_FIXED__', 'Nội Tim mạch')
+    };
+    $('middleWard').replaceChildren(new Option('Chọn khoa thứ 2…', ''));
+    for (const w of catalog.wards) {
+      if (C.isClinic(w.name) || w.id === roles.tm.id || ($('origin').value === 'CAP_CUU' && w.id === roles.cc.id)) continue;
+      $('middleWard').add(new Option(w.name, w.id));
+    }
+    if ([...$('middleWard').options].some(o => o.value === old)) $('middleWard').value = old;
     NG.wards = catalog.wards.map(w => ({...w}));
-    notice(catalog.error);
-    updateLabels();
-  }
-  function updateLabels() {
-    $('admitHint').textContent = 'Nội trú bắt đầu từ mốc vào Cấp cứu hoặc vào từ Phòng khám.';
-    const w = getWard('finalWard');
-    $('exitLabel').textContent = 'Ra khoa ' + (w ? w.name.replace(/^khoa\s+/i, '') : 'điều trị cuối');
+    const missing = [roles.tm, ...($('origin').value === 'CAP_CUU' ? [roles.cc] : [])].filter(w => w.missing);
+    notice([catalog.error, missing.length ? 'Danh mục chưa có ' + missing.map(w=>w.name).join(', ') + '. Vẫn tính ngày với khoa cố định; đơn giá để trống đến khi bạn cập nhật danh mục.' : ''].filter(Boolean).join('\n'));
   }
   function toggleMiddle() {
     const active = $('hasMiddle').checked;
@@ -42,7 +47,7 @@
   }
   function time(prefix, label) {
     if (!$(prefix + 'Date').value || !$(prefix + 'Time').value) throw new Error('Nhập đủ ngày và giờ ' + label + '.');
-    return $(prefix + 'Date').value + 'T' + $(prefix + 'Time').value;
+    return $(prefix + 'Date').value + 'T' + NG_ENGINE.normalizeClock($(prefix + 'Time').value);
   }
   function requireWard(id, label) {
     const w = getWard(id);
@@ -50,18 +55,17 @@
     return w;
   }
   function payload() {
-    const final = requireWard('finalWard', 'khoa điều trị cuối');
+    const final = roles.tm;
     const arrival = time('arrival', 'vào Cấp cứu / Phòng khám');
-    const finalStart = time('final', 'vào khoa điều trị cuối');
+    const finalStart = time('final', 'vào khoa Nội Tim mạch');
     const end = time('exit', 'kết thúc đợt nội trú');
     const stays = [];
-    const cc = requireWard('ccWard', 'khoa tiếp nhận ban đầu');
+    const cc = $('origin').value === 'CAP_CUU' ? roles.cc : null;
     if ($('hasMiddle').checked) {
       const middle = requireWard('middleWard', 'khoa thứ 2');
-      if (middle.id === final.id || middle.id === cc.id) throw new Error('Khoa thứ 2 phải khác khoa tiếp nhận và khoa điều trị cuối. Bỏ chọn “Có khoa thứ 2” nếu không có chuyển khoa này.');
+      if (middle.id === final.id || (cc && middle.id === cc.id) || C.isClinic(middle.name)) throw new Error('Khoa thứ 2 phải là khoa có giường, khác Cấp cứu và Nội Tim mạch. Bỏ chọn nếu không có khoa này.');
       stays.push({wardId:middle.id, name:middle.name, price:middle.price, start:time('middle','vào khoa thứ 2'), end:finalStart});
     }
-    if (final.id === cc.id) throw new Error('Khoa điều trị cuối phải khác khoa tiếp nhận trong mẫu này.');
     stays.push({wardId:final.id, name:final.name, price:final.price, start:finalStart, end});
     return {origin:$('origin').value, arrival, originWardId:cc && cc.id, originName:cc && cc.name, originPrice:cc && cc.price, status:$('status').value, stays};
   }
@@ -78,11 +82,15 @@
     if (r.totalDays === 0) return 'Cả đợt nội trú ≤4 giờ: không tính ngày giường.';
     if (full) reasons.push(full + ' ngày trọn');
     if (half) reasons.push(half + ' lần × 0,5 ngày chuyển khoa' + (three ? ' (xét giờ và giá)' : ''));
-    if (!w.days && rows.some(d => /Cấp cứu ≤4|Cấp cứu.*≤4/.test(d.explanation))) reasons.push('Cấp cứu ≤4 giờ: không tính giường hồi sức cấp cứu');
+    if (!w.days && rows.some(d => d.emergency && d.excluded)) reasons.push('Cấp cứu ≤4 giờ: không tính giường hồi sức cấp cứu');
     if (!w.days && rows.some(d => /≤4 giờ, không thuộc/.test(d.explanation))) reasons.push('Chuyển ≥3 khoa: thời gian ≤4 giờ, không thuộc nhóm chọn giá');
     if (!w.days && rows.some(d => /giá không phải/.test(d.explanation))) reasons.push('Giá không phải cao nhất hoặc thấp nhất trong nhóm >4 giờ');
     if (!w.days && !w.hasPending && !reasons.length) reasons.push('Không có ngày được phân bổ theo quy ước bỏ ngày ra viện');
-    if (w.hasPending) reasons.push('Còn phần cần đối chiếu; mở chi tiết theo ngày');
+    if (w.hasPending) {
+      const code = rows.find(d => d.days === null)?.pendingReason;
+      const pendingText = {THREE_TOO_FEW:'Ngày chuyển ≥3 khoa chưa đủ 2 khoa nằm >4 giờ; cần đối chiếu',THREE_MISSING_PRICE:'Thiếu giá để chọn khoa cao nhất/thấp nhất trong ngày ≥3 khoa',THREE_PRICE_TIE:'Có khoa đồng giá cao nhất/thấp nhất; cần đối chiếu',CC_EXCLUSION_SPLIT:'Khoa thông thường không có ngưỡng 4 giờ riêng khi chuyển 2 khoa; cần đối chiếu phần chia ngày',SHORT_OVERNIGHT:'Đợt <24 giờ qua nửa đêm có chuyển khoa; cần đối chiếu',MISSING_WARD:'Ngày chưa xác định được khoa có giường thực tế'};
+      reasons.push(pendingText[code] || 'Còn phần cần đối chiếu; mở chi tiết theo ngày');
+    }
     return reasons.join('; ') + '.';
   }
   function render(r, p) {
@@ -123,14 +131,24 @@
   }
   $('calcForm').addEventListener('input', dirty);
   $('calcForm').addEventListener('change', dirty);
-  $('origin').addEventListener('change', () => {
-    const pattern = $('origin').value === 'CAP_CUU' ? /cap cuu/ : /phong kham/;
-    const preferred = catalog.wards.find(w => pattern.test(C.fold(w.name)));
-    $('ccWard').value = preferred ? preferred.id : '';
-    updateLabels();
-  });
-  $('finalWard').addEventListener('change', updateLabels);
+  $('origin').addEventListener('change', () => loadCatalog(true));
   $('hasMiddle').addEventListener('change', toggleMiddle);
+  const clocks = ['arrival','middle','final','exit'].map(prefix => $(prefix + 'Time'));
+  function normalizeClocks() {
+    for (const input of clocks) {
+      if (input.disabled || !input.value.trim()) continue;
+      try { input.value = NG_ENGINE.normalizeClock(input.value); input.setCustomValidity(''); }
+      catch (error) { input.setCustomValidity(error.message); throw error; }
+    }
+  }
+  for (const input of clocks) {
+    input.addEventListener('input', () => input.setCustomValidity(''));
+    input.addEventListener('blur', () => {
+      if (!input.value.trim()) return;
+      try { input.value = NG_ENGINE.normalizeClock(input.value); input.setCustomValidity(''); }
+      catch (error) { input.setCustomValidity(error.message); }
+    });
+  }
   for (const prefix of ['arrival','middle','final']) {
     $(prefix + 'Date').addEventListener('change', () => {
       const order = ['arrival','middle','final','exit'], index = order.indexOf(prefix);
@@ -140,12 +158,13 @@
   $('calcForm').addEventListener('submit', event => {
     event.preventDefault(); dirty();
     try {
+      normalizeClocks();
       if (!$('calcForm').reportValidity()) return;
       const p = payload(); render(NG_ENGINE.calculate(p), p);
     } catch (error) { $('formError').textContent = error.message; $('formError').hidden = false; }
   });
   $('resetBtn').addEventListener('click', () => {
-    $('calcForm').reset(); dirty(); loadCatalog(); toggleMiddle(); $('arrivalTime').focus();
+    $('calcForm').reset(); clocks.forEach(input=>input.setCustomValidity('')); dirty(); loadCatalog(); toggleMiddle(); $('arrivalTime').focus();
   });
   $('copyBtn').addEventListener('click', async () => {
     if (!lastResult) return;

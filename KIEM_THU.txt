@@ -1,43 +1,32 @@
-TÍNH NGÀY GIƯỜNG — 2.0.0
-Ngày: 15/10/2026
+TÍNH NGÀY GIƯỜNG 2.1.0 — 15/10/2026
 
-127 ca kiểm tra bộ tính, danh mục và cấu trúc gói: đạt, 0 lỗi.
-600 đợt điều trị sinh tự động: tổng ngày khớp công thức đối chiếu độc lập;
-phần phân bổ xác định + số ngày chờ đối chiếu luôn bằng tổng.
+155 ca bộ tính/danh mục/giờ 24h/cấu trúc gói và 600 đợt đối chiếu độc lập: đạt.
+20 luồng giao diện mô phỏng DOM, nhập/xuất Excel thật: đạt.
 
-Các nhóm đã kiểm tra:
-- Đúng 4 giờ, 4 giờ 1 phút, 23 giờ 59 phút, đúng 24 giờ.
-- Tất cả 7 tình trạng kết thúc đợt điều trị.
-- Cấp cứu hoặc vào từ Phòng khám đều là mốc nội trú, không bị thay bởi
-  tùy chọn cũ KHOA/CUSTOM. Khoảng trước khoa điều trị cuối được cộng vào tổng.
-- Loại trừ riêng giường HSCC ≤4 giờ chỉ áp cho nguồn Cấp cứu.
-- Chuyển 2 khoa, 3 khoa; ngưỡng >4 giờ; giá cao/thấp; đồng giá; thiếu giá.
-- Qua nửa đêm, chuyển đúng 00:00, tử vong đúng 00:00, năm nhuận, qua năm.
-- Ngày giờ không hợp lệ; thời gian âm, khoảng trống/chồng lấn; giá không hợp lệ.
-- Excel .xlsx và .xls thật qua ghi/đọc nhị phân bằng SheetJS 0.20.3.
-- Một sheet, hai cột; trùng khoa không phân biệt dấu/hoa thường/prefix Khoa.
-- Giá số, dạng phân cách hàng nghìn; thiếu giá, âm, phần lẻ, công thức, ô lỗi.
-- Ghi danh mục thành công; lưu bị chặn; dữ liệu lưu hỏng; đổi bản dùng chung;
-  đồng hồ thiết bị sai; tên khoa chứa ký tự HTML không chạy thành mã.
-- Tệp và liên kết nội bộ đủ; ID phần tử không trùng; script tham chiếu đúng phần tử.
+Kiểm tra các yêu cầu sửa:
+- Chỉ còn chọn nguồn Cấp cứu/Phòng khám; khoa trung gian tùy chọn.
+- Khoa cuối cố định Nội Tim mạch, không còn ô chọn khoa cuối.
+- Cả 4 ô giờ HH:mm 24h, gõ 0730/1845, chặn giờ sai và AM/PM.
+- PK không có giường, giá, phần nửa ngày hoặc vai trò khoa thứ ba.
+- PK → Nội3h → TM: 2 khoa giường, Nội vẫn 0,5 ngày theo quy tắc 2 khoa.
+- CC2h → Nội6h → TM16h: CC0, hai khoa còn lại 0,5 mỗi khoa, không bị chặn.
+- Ca ảnh CC1h31 → Nội3h01 → TM29 phút ngày đầu: tổng 5, TM xác định 4,
+  ngày đầu cần đối chiếu vì >=3 khoa chưa đủ hai khoa >4h. Lý do CC <=4h
+  chỉ ở dòng CC, không sao chép sang Nội hoặc TM.
+- Nâng từ bản cũ giữ mã/giá các khoa, chỉ loại giường PK khỏi sử dụng.
+- Tra giá đúng khoa Tim mạch sau nhập Excel (kể cả có prefix Khoa).
+- Sửa đầu vào ẩn kết quả cũ; nhập sai không giữ kết quả cũ; nhập mới xóa lỗi.
+- Nhập/xuất Excel thật một sheet/hai cột; chặn công thức, thiếu/âm giá, khoa
+  trùng, PK giả thành khoa giường; lỗi nhập không ghi đè danh mục cũ.
+- Mẫu Excel không có PK và không bịa đơn giá; xuất danh mục dùng chung.
 
-16 luồng tương tác đã kiểm tra bằng mô phỏng DOM:
-- Mặc định khoa; bật/ẩn khoa trung gian; tính 2 và 3 khoa; tiền theo danh mục.
-- Sửa đầu vào làm ẩn kết quả cũ; nhập giờ sai không còn kết quả cũ.
-- Phòng khám cũng bắt đầu nội trú từ mốc tiếp nhận; nhập ca mới; đọc danh mục.
-- Nhập Excel xem trước rồi lưu; giữ bản cũ khi tệp/giá sai.
-- Xuất Excel thật; mẫu một sheet không bịa giá; xuất danh mục dùng chung.
+Giữ kiểm tra ngưỡng 4h/24h cả đợt, 7 tình trạng cuối đợt, ngày nhuận,
+qua năm/nửa đêm, giờ chồng lấn/khoảng trống, >=3 khoa thiếu giá/đồng giá.
+Phần xác định + phần chờ luôn bằng tổng đợt.
 
-Đã đối chiếu tính độc lập múi giờ với UTC và America/New_York.
+Giới hạn: mô phỏng DOM không phải kiểm tra hiển thị trên trình duyệt thật.
+Chưa cập nhật repository/GitHub Pages thực tế. Quy ước ngày lịch được công
+khai; phần chưa đủ căn cứ tự động phân bổ giữ nguyên nhãn cần đối chiếu.
 
-Giới hạn:
-- Không có kiểm tra hiển thị trong trình duyệt thật ở lần thực hiện này.
-- Chưa triển khai vào repository/GitHub Pages thực tế của người dùng.
-- Kiểm thử xác nhận thực thi bộ quy tắc đã công khai, không biến quy ước chia
-  theo ngày lịch thành một quyết định thanh toán BHYT chính thức.
-- Các tổ hợp cần đối chiếu được giữ nhãn chờ, không tự suy diễn cách chia.
-
-Chạy lại: node check.cjs
-
-Đóng gói lại: toàn bộ 16 tệp nằm trong một thư mục, không có thư mục con.
-Đường dẫn thư viện Excel và bộ kiểm tra đã được cập nhật tương ứng.
+Gói: 16 tệp trong một thư mục, không có thư mục con.
+Chạy kiểm tra: node check.cjs

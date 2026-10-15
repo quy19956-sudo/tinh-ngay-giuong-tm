@@ -7,6 +7,7 @@
   const clean = value => String(value == null ? '' : value).normalize('NFC').trim().replace(/\s+/g, ' ');
   const fold = value => clean(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
   const nameKey = value => fold(value).replace(/^khoa\s+/, '');
+  const isClinic = value => /^(phong kham|kham benh)(\s|$)/.test(nameKey(value));
   function price(value, required = true) {
     if (value === null || value === undefined || clean(value) === '') {
       if (required) throw new Error('thiếu giá tiền');
@@ -44,6 +45,7 @@
       try {
         if (!name) throw new Error('thiếu tên khoa');
         if (typeof row.name !== 'string') throw new Error('tên khoa phải là văn bản');
+        if (isClinic(name)) throw new Error('Phòng khám là đường vào viện, không có giường; không đưa vào danh mục giá giường');
         if (name.length > 100 || /[\x00-\x1f\x7f]/.test(String(row.name))) throw new Error('tên khoa không hợp lệ hoặc dài quá 100 ký tự');
         const key = nameKey(name);
         if (!key) throw new Error('thiếu tên khoa');
@@ -62,17 +64,21 @@
   }
   function load() {
     const base = root.NG_DEFAULT_CATALOG || {updatedAt: 0, wards: []};
-    const result = {wards: clone(base.wards), source: 'shared', savedAt: base.updatedAt, error: ''};
+    const result = {wards: clone(base.wards.filter(w => !isClinic(w.name))), source: 'shared', savedAt: base.updatedAt, error: ''};
     try {
       const raw = root.localStorage.getItem(KEY);
       if (!raw) return result;
       const saved = JSON.parse(raw);
       if (saved.schema !== 2 || !Number.isFinite(saved.savedAt)) throw new Error('sai định dạng');
-      const wards = validate(saved.wards, {requiredPrices: false});
+      const previous = saved.wards;
+      if (!Array.isArray(previous)) throw new Error('sai danh mục');
+      const bedRows = previous.filter(w => !isClinic(w.name));
+      const wards = validate(bedRows, {requiredPrices: false});
+      const migrationNote = bedRows.length !== previous.length ? 'Đã loại mục Phòng khám khỏi danh mục giường của bản cũ. Các khoa và đơn giá còn lại được giữ nguyên.' : '';
       // Bản đã lưu với cùng danh mục gốc vẫn dùng được khi đồng hồ máy bị sai.
       const currentBase = saved.baseRevision === base.updatedAt;
       const legacy = saved.baseRevision === undefined && saved.savedAt >= base.updatedAt;
-      if (currentBase || legacy) return {wards, source: 'local', savedAt: saved.savedAt, error: ''};
+      if (currentBase || legacy) return {wards, source: 'local', savedAt: saved.savedAt, error: migrationNote};
       return result;
     } catch (error) {
       result.error = 'Không đọc được danh mục đã lưu; đang dùng danh mục mặc định. Có thể nhập lại Excel tại trang Danh mục.';
@@ -118,5 +124,5 @@
       'globalThis.NG_DEFAULT_CATALOG = ' + JSON.stringify({updatedAt: Date.now(), wards}, null, 2)
         .replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029') + ';\n';
   }
-  root.NG_CATALOG = {KEY, load, save, validate, price, fold, nameKey, fromWorkbook, sharedFile};
+  root.NG_CATALOG = {KEY, load, save, validate, price, fold, nameKey, isClinic, fromWorkbook, sharedFile};
 })(globalThis);

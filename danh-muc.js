@@ -3,7 +3,6 @@ globalThis.NG_DEFAULT_CATALOG = {
   updatedAt: 1792075200000,
   wards: [
     {id:'CC', name:'Cấp cứu', price:null},
-    {id:'PK', name:'Phòng khám', price:null},
     {id:'TM', name:'Nội Tim mạch', price:null},
     {id:'HSTC', name:'Hồi sức tích cực', price:null},
     {id:'NOI', name:'Nội tổng hợp', price:null},
