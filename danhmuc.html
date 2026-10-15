@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ngày giường">
+  <title>Danh mục khoa · Ngày giường</title>
+  <meta name="description" content="Cập nhật danh mục khoa có giường và đơn giá bằng Excel một sheet, hai cột.">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=3.0.0">
+  <script defer src="danh-muc.js?v=3.0.0"></script>
+  <script defer src="catalog.js?v=3.0.0"></script>
+  <script defer src="xlsx.full.min.js?v=3.0.0"></script>
+  <script defer src="catalog-page.js?v=3.0.0"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Đến nội dung chính</a>
+<div class="shell">
+  <header class="header">
+    <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 4.8a5.5 5.5 0 0 0-7.8 0L12 5.6l-.8-.8a5.5 5.5 0 0 0-7.8 7.8L12 21l8.6-8.4a5.5 5.5 0 0 0 0-7.8Z"/><path d="M4.5 12h4l1.8-3.5 3.1 7 1.8-3.5h4.3"/></svg></span><span>Ngày giường<small>Nội Tim mạch</small></span></a>
+    <nav class="tab-bar" aria-label="Trang"><a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="4"/><path d="M8 7h8M8 12h2m4 0h2m-8 4h2m4 0h2"/></svg><span>Tính ngày</span></a><a href="danhmuc.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 8h.01M11 8h5M8 12h.01M11 12h5M8 16h.01M11 16h5"/></svg><span>Danh mục</span></a></nav>
+    <span class="header-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/></svg><span>Giờ Việt Nam</span></span>
+  </header>
+  <main id="main">
+    <div class="page-title"><div><p class="eyebrow">QUẢN LÝ GIÁ GIƯỜNG</p><h1>Danh mục khoa</h1><p>Cập nhật khoa và đơn giá. Lưu một lần, dùng ngay khi tính.</p></div></div>
+    <section class="card catalog-card" aria-labelledby="importTitle">
+      <div class="import-bar">
+        <div class="import-intro"><span class="import-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Zm0 0v6h6M12 17v-5m-3 3 3-3 3 3"/></svg></span><div><h2 id="importTitle">Nhập danh mục Excel</h2><p class="muted small">1 sheet · Cột A: tên khoa · Cột B: giá tiền (đ/ngày)</p></div></div>
+        <div class="actions"><button class="btn" id="templateBtn" type="button">Tải mẫu</button><label class="btn primary file-btn" for="excelFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Zm0 0v6h6M12 17v-5m-3 3 3-3 3 3"/></svg>Chọn Excel<input class="sr-only" id="excelFile" type="file" accept=".xlsx,.xls"></label></div>
+      </div>
+      <p class="import-note">Chỉ nhập khoa có giường. Kiểm tra bảng sau khi chọn Excel, rồi bấm Lưu danh mục.</p>
+      <div id="catalogMessage" class="notice" role="status" hidden></div>
+      <div class="catalog-info"><span id="catalogCount" class="muted small"></span><span id="unsaved" class="pill warning-pill" hidden>Chưa lưu</span></div>
+      <form id="catalogForm" novalidate>
+        <div class="catalog-table-wrap">
+          <table class="catalog-table"><colgroup><col><col class="price-col"><col class="delete-col"></colgroup><thead><tr><th scope="col">Tên khoa</th><th scope="col">Giá tiền <span class="unit-label">(đ/ngày)</span></th><th scope="col"><span class="sr-only">Xóa</span></th></tr></thead><tbody id="catalogRows"></tbody></table>
+        </div>
+        <div class="catalog-actions"><button type="button" class="text-btn" id="addWardBtn"><span aria-hidden="true">＋</span> Thêm khoa</button><div class="actions"><button type="button" class="btn" id="revertBtn">Bỏ thay đổi</button><button type="submit" class="btn primary" id="saveCatalogBtn">Lưu danh mục</button></div></div>
+      </form>
+    </section>
+    <p class="section-note">Phòng khám không có giường. Danh mục lưu trên trình duyệt này; Excel được đọc trực tiếp trên thiết bị.</p>
+    <details class="rules sharing">
+      <summary><span class="rule-symbol" aria-hidden="true">↥</span>Sao lưu &amp; dùng chung<span class="disclosure-note">Tùy chọn</span></summary>
+      <div class="rules-content">
+        <p>Đổi máy: xuất Excel rồi nhập lại trên máy mới. Muốn mọi người dùng chung trên GitHub Pages: tải “danh-muc.js” và thay tệp cùng tên ở thư mục gốc của repository. Khi cập nhật bản dùng chung, các bản lưu dựa trên danh mục gốc cũ sẽ dùng bản mới.</p>
+        <div class="actions"><button id="exportBtn" class="btn small-btn" type="button">Xuất Excel</button><button id="sharedBtn" class="btn small-btn" type="button">Tải danh-muc.js dùng chung</button></div>
+      </div>
+    </details>
+    <p class="section-note">Nhập Excel mới sẽ thay toàn bộ danh mục sau khi bạn bấm Lưu. Giá dùng để chọn khoa khi chuyển từ 3 khoa trong ngày và tạm tính tiền giường.</p>
+  </main>
+  <footer><span>Khoa có giường · Giá tính bằng đồng/ngày.</span><span>Bản 3.0</span></footer>
+</div>
+<noscript><p class="notice error">Hãy bật JavaScript để sử dụng trang danh mục.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,54 @@
+TÍNH NGÀY GIƯỜNG 3.0.0 — 16/10/2026
+
+Bản đầy đủ giao diện web phong cách iOS 27.
+Giữ nguyên bộ tính 2.1.0, danh mục, đọc Excel và dữ liệu mặc định.
+
+KẾT QUẢ KIỂM TRA
+- 155 kiểm tra bộ tính/danh mục/giờ 24h/cấu trúc gói: đạt.
+- 600 đợt đối chiếu độc lập: đạt.
+- 20 luồng thao tác mô phỏng DOM với nhập/xuất Excel thật: đạt.
+- Cú pháp toàn bộ JavaScript và bảng CSS: hợp lệ.
+- Hai trang không trùng ID, không thiếu đích nhãn hay tệp tham chiếu.
+- Tất cả đích gọi từ app.js và catalog-page.js có trong trang tương ứng.
+- engine.js, catalog.js, catalog-page.js, danh-muc.js và thư viện Excel
+  giữ nguyên từng byte so với bản 2.1.
+- SVG biểu tượng hợp lệ. Không có phông chữ, CSS hay script tải từ CDN.
+
+CÁC LUỒNG ĐÃ KIỂM TRA LẠI
+- Hàng đầu chỉ có Cấp cứu/Phòng khám; khoa thứ 2 tùy chọn.
+- Khoa cuối cố định Nội Tim mạch, không có ô chọn khoa cuối.
+- Bốn ô giờ nhập HH:mm 24h; chuẩn hóa 0730/1845; chặn 24:00.
+- Phòng khám không có ngày giường, tiền giường hoặc phần 0,5 ngày;
+  không đếm là khoa thứ ba khi đi qua hai khoa có giường.
+- CC2h → Nội6h → TM16h: CC0; hai khoa còn lại 0,5 ngày mỗi khoa.
+- Ca ảnh CC1h31 → Nội3h01 → TM29 phút ngày đầu: tổng 5; TM đã xác định
+  4 ngày; phần ngày đầu chờ đối chiếu theo quy tắc >=3 khoa chưa đủ hai
+  khoa >4h. Lý do CC <=4h chỉ hiển thị cho Cấp cứu.
+- Sửa đầu vào ẩn kết quả cũ; Nhập mới xóa giờ và lỗi.
+- Nhập Excel xem trước, chỉ thay danh mục sau khi Lưu; tệp sai hoặc
+  giá âm không ghi đè bản đã lưu.
+- Tra đúng giá Nội Tim mạch kể cả tên có tiền tố Khoa.
+- Mẫu, xuất Excel một sheet/hai cột và xuất danh-muc.js dùng chung.
+- Bản cũ có Phòng khám được lọc mục đó và giữ giá các khoa còn lại.
+
+THIẾT KẾ
+- Thanh điều hướng kính mờ; nhóm biểu mẫu bo tròn; công tắc chuyển khoa.
+- Thanh tab dưới ở màn hình nhỏ; tab trên ở máy tính.
+- Chế độ sáng/tối, giảm chuyển động, giảm độ trong suốt, tăng tương phản
+  theo tùy chọn hệ thống khi trình duyệt hỗ trợ.
+- Giảm chuyển động cũng được tôn trọng khi tự cuộn đến kết quả.
+- In chỉ phần kết quả; chi tiết theo ngày được in nếu đã mở.
+
+GIỚI HẠN KIỂM TRA
+Mô phỏng DOM và kiểm tra cú pháp không thay thế việc xem trên trình duyệt
+thật. Chưa kiểm tra hiển thị bằng Safari trên iPhone/iOS 27 thực tế.
+Đây là giao diện web mô phỏng; lịch và bảng chọn còn theo trình duyệt,
+không khẳng định giống ứng dụng iOS gốc 100%.
+Chưa cập nhật bản 3.0 lên repository hoặc xác nhận GitHub Pages triển khai.
+
+Phân bổ theo quy ước ngày lịch đã công khai; phần chưa đủ căn cứ tự động
+phân bổ vẫn giữ nhãn Cần đối chiếu. Không thay đổi quy tắc pháp lý ở bản này.
+
+ĐÓNG GÓI
+17 tệp nằm cùng cấp trong thư mục Tinh-Ngay-Giuong; không có thư mục con.
+Tự kiểm tra bộ tính: node check.cjs
