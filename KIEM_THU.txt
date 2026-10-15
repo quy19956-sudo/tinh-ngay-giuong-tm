@@ -1,0 +1,43 @@
+TÍNH NGÀY GIƯỜNG — 2.0.0
+Ngày: 15/10/2026
+
+127 ca kiểm tra bộ tính, danh mục và cấu trúc gói: đạt, 0 lỗi.
+600 đợt điều trị sinh tự động: tổng ngày khớp công thức đối chiếu độc lập;
+phần phân bổ xác định + số ngày chờ đối chiếu luôn bằng tổng.
+
+Các nhóm đã kiểm tra:
+- Đúng 4 giờ, 4 giờ 1 phút, 23 giờ 59 phút, đúng 24 giờ.
+- Tất cả 7 tình trạng kết thúc đợt điều trị.
+- Cấp cứu hoặc vào từ Phòng khám đều là mốc nội trú, không bị thay bởi
+  tùy chọn cũ KHOA/CUSTOM. Khoảng trước khoa điều trị cuối được cộng vào tổng.
+- Loại trừ riêng giường HSCC ≤4 giờ chỉ áp cho nguồn Cấp cứu.
+- Chuyển 2 khoa, 3 khoa; ngưỡng >4 giờ; giá cao/thấp; đồng giá; thiếu giá.
+- Qua nửa đêm, chuyển đúng 00:00, tử vong đúng 00:00, năm nhuận, qua năm.
+- Ngày giờ không hợp lệ; thời gian âm, khoảng trống/chồng lấn; giá không hợp lệ.
+- Excel .xlsx và .xls thật qua ghi/đọc nhị phân bằng SheetJS 0.20.3.
+- Một sheet, hai cột; trùng khoa không phân biệt dấu/hoa thường/prefix Khoa.
+- Giá số, dạng phân cách hàng nghìn; thiếu giá, âm, phần lẻ, công thức, ô lỗi.
+- Ghi danh mục thành công; lưu bị chặn; dữ liệu lưu hỏng; đổi bản dùng chung;
+  đồng hồ thiết bị sai; tên khoa chứa ký tự HTML không chạy thành mã.
+- Tệp và liên kết nội bộ đủ; ID phần tử không trùng; script tham chiếu đúng phần tử.
+
+16 luồng tương tác đã kiểm tra bằng mô phỏng DOM:
+- Mặc định khoa; bật/ẩn khoa trung gian; tính 2 và 3 khoa; tiền theo danh mục.
+- Sửa đầu vào làm ẩn kết quả cũ; nhập giờ sai không còn kết quả cũ.
+- Phòng khám cũng bắt đầu nội trú từ mốc tiếp nhận; nhập ca mới; đọc danh mục.
+- Nhập Excel xem trước rồi lưu; giữ bản cũ khi tệp/giá sai.
+- Xuất Excel thật; mẫu một sheet không bịa giá; xuất danh mục dùng chung.
+
+Đã đối chiếu tính độc lập múi giờ với UTC và America/New_York.
+
+Giới hạn:
+- Không có kiểm tra hiển thị trong trình duyệt thật ở lần thực hiện này.
+- Chưa triển khai vào repository/GitHub Pages thực tế của người dùng.
+- Kiểm thử xác nhận thực thi bộ quy tắc đã công khai, không biến quy ước chia
+  theo ngày lịch thành một quyết định thanh toán BHYT chính thức.
+- Các tổ hợp cần đối chiếu được giữ nhãn chờ, không tự suy diễn cách chia.
+
+Chạy lại: node check.cjs
+
+Đóng gói lại: toàn bộ 16 tệp nằm trong một thư mục, không có thư mục con.
+Đường dẫn thư viện Excel và bộ kiểm tra đã được cập nhật tương ứng.
